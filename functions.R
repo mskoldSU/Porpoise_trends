@@ -78,3 +78,11 @@ make_indices <- function(index_stations, index_years, index_season, response){
     mutate(station = factor(station, c(index_stations, all_stations))) %>% 
     ungroup()
 }
+
+trend_fig <- function(data, y_lab){
+  data %>% ggplot(aes(x = year, y = index)) + 
+    geom_smooth(method = "glm", method.args = list(family = gaussian(link = "log")), color = "steelblue") + 
+    geom_point() + facet_wrap(~station, scales = "free_y")+ theme_bw() + 
+    scale_x_continuous(breaks = seq(2012, 2019, by = 2)) + scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
+    xlab("") + ylab(y_lab)
+}

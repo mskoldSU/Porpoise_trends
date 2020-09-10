@@ -133,14 +133,10 @@ season_fig <- ggplot() + geom_line(data = fit_common, aes(x = julian_day, y = pr
 ## Index trend figs
 ##
 
-index_data <- make_indices(index_stations, index_years, index_season, response = "dph")
-
-trend_fig <- index_data %>% ggplot(aes(x = year, y = index)) + 
-  geom_smooth(method = "glm", method.args = list(family = gaussian(link = "log")), color = "steelblue") + 
-  geom_point() + facet_wrap(~station, scales = "free_y")+ theme_bw() + 
-  scale_x_continuous(breaks = seq(2012, 2019, by = 2)) + scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
-  xlab("") + ylab("Mean daily DPH")
-
+indices <- c("dph", "dps", "n_clicks", "n_encounters", "n_trains")
+index_data <- map(indices, ~make_indices(index_stations, index_years, index_season, response = .x))
+y_labs <- c("Mean daily DPH", "Mean daily DPS", "Mean daily clicks", "Mean daily encounters", "Mean daily click trains")
+trend_figs <- map2(index_data, y_labs, ~trend_fig(.x, .y))
 
 ##
 ## Data fig
@@ -164,6 +160,6 @@ data_fig <- daily_data %>% ggplot(aes(x = date, y = dph)) +
 ggsave(map_basic, filename = "figs/map_basic.pdf", width = 7, height = 6)
 ggsave(map_dph, filename = "figs/map_dph.pdf", width = 7, height = 10)
 ggsave(season_fig, filename = "figs/season_fig.pdf", width = 7, height = 3)
-ggsave(trend_fig, filename = "figs/trend_fig.pdf", width = 7, height = 6)
+walk2(trend_figs, indices, ~ggsave(.x, filename = paste0("figs/trend_fig_", .y, ".pdf"), width = 7, height = 6))
 ggsave(data_fig, filename = "figs/data_fig.pdf", width = 7, height = 6)
 

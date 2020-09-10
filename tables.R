@@ -27,11 +27,12 @@ data_table <- summary_table(daily_data) %>%
 
 
 ##
-## Trends table
+## Trends tables
 ##
 
-index_data <- make_indices(index_stations, index_years, index_season, response = "dph")
-trend_table_dph <- coeff_table(index_data)
+indices <- c("dph", "dps", "n_clicks", "n_encounters", "n_trains")
+index_data <- map(indices, ~make_indices(index_stations, index_years, index_season, response = .x))
+coeff_tables <- map(index_data, coeff_table)
 
 
 ##
@@ -39,6 +40,6 @@ trend_table_dph <- coeff_table(index_data)
 ##
 
 xlsx::write.xlsx(data_table, "tables.xlsx", sheetName = "data_table", append = FALSE)
-xlsx::write.xlsx(trend_table, "tables.xlsx", sheetName = "trend_table_dph", append = TRUE)
+walk2(paste0("trend_table_", indices), coeff_tables, ~xlsx::write.xlsx(.y, "tables.xlsx", sheetName = .x, append = TRUE))
 
 

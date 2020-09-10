@@ -24,7 +24,7 @@ knitr::include_graphics("figs/season_fig.pdf")
 ```
 
 ```{r, fig.cap= "Yearly indices with fitted trends."}
-knitr::include_graphics("figs/trend_fig.pdf")
+knitr::include_graphics("figs/trend_fig_dph.pdf")
 ```
 
 
@@ -52,9 +52,65 @@ readxl::read_excel("tables.xlsx", sheet = "trend_table_dph") %>%
   kbl(booktabs = TRUE, 
       align = "lrrrrr",
       col.names = c("Station", "Yearly trend %", "-5%", "5%", "-5%", "5%"),
-      caption = "Trends") %>% 
+      caption = "Trends DPH") %>% 
   add_header_above(c(" " = 2, "Power to detect trend\n based on 10 years data" = 2, "Years required\n for 80% power" = 2))
 ```
 
 
+# SI
 
+```{r, asis = TRUE}
+readxl::read_excel("tables.xlsx", sheet = "trend_table_dps") %>% 
+  select(-"...1")  %>% 
+  kbl(booktabs = TRUE, 
+      align = "lrrrrr",
+      col.names = c("Station", "Yearly trend %", "-5%", "5%", "-5%", "5%"),
+      caption = "Trends DPS") %>% 
+  add_header_above(c(" " = 2, "Power to detect trend\n based on 10 years data" = 2, "Years required\n for 80% power" = 2))
+```
+
+```{r, asis = TRUE}
+readxl::read_excel("tables.xlsx", sheet = "trend_table_n_clicks") %>% 
+  select(-"...1")  %>% 
+  kbl(booktabs = TRUE, 
+      align = "lrrrrr",
+      col.names = c("Station", "Yearly trend %", "-5%", "5%", "-5%", "5%"),
+      caption = "Trends clicks") %>% 
+  add_header_above(c(" " = 2, "Power to detect trend\n based on 10 years data" = 2, "Years required\n for 80% power" = 2))
+```
+
+```{r, asis = TRUE}
+readxl::read_excel("tables.xlsx", sheet = "trend_table_n_encounters") %>% 
+  select(-"...1")  %>% 
+  kbl(booktabs = TRUE, 
+      align = "lrrrrr",
+      col.names = c("Station", "Yearly trend %", "-5%", "5%", "-5%", "5%"),
+      caption = "Trends encounters") %>% 
+  add_header_above(c(" " = 2, "Power to detect trend\n based on 10 years data" = 2, "Years required\n for 80% power" = 2))
+```
+
+```{r, asis = TRUE}
+readxl::read_excel("tables.xlsx", sheet = "trend_table_n_trains") %>% 
+  select(-"...1")  %>% 
+  kbl(booktabs = TRUE, 
+      align = "lrrrrr",
+      col.names = c("Station", "Yearly trend %", "-5%", "5%", "-5%", "5%"),
+      caption = "Trends click trains") %>% 
+  add_header_above(c(" " = 2, "Power to detect trend\n based on 10 years data" = 2, "Years required\n for 80% power" = 2))
+```
+
+```{r, fig.cap= "Yearly indices with fitted trends."}
+knitr::include_graphics("figs/trend_fig_dps.pdf")
+```
+
+```{r, fig.cap= "Yearly indices with fitted trends."}
+knitr::include_graphics("figs/trend_fig_n_clicks.pdf")
+```
+
+```{r, fig.cap= "Yearly indices with fitted trends."}
+knitr::include_graphics("figs/trend_fig_n_encounters.pdf")
+```
+
+```{r, fig.cap= "Yearly indices with fitted trends."}
+knitr::include_graphics("figs/trend_fig_n_trains.pdf")
+```
