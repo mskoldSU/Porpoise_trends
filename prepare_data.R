@@ -22,14 +22,14 @@ data_full <- read_delim(file_contents,
 rm(file_contents) 
 
 # Dates/stations without/with detections are needed for padding
-zero_days <- data_full %>% 
-  filter(dpm == 0) %>% 
+all_days <- data_full %>% 
   select(date, station, file_id) %>% 
   distinct()
 detection_days <- data_full %>% 
   filter(dpm > 0) %>% 
   select(date, station, file_id) %>% 
   distinct()
+zero_days <- setdiff(all_days, detection_days)
 
 # Count DPH
 daily_dph <- data_full %>% 
