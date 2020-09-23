@@ -60,6 +60,10 @@ readxl::read_excel("tables.xlsx", sheet = "trend_table_dph") %>%
 knitr::include_graphics("figs/cluster_fig.pdf")
 ```
 
+```{r, fig.cap= "Trends for all metrics with confidence interval"}
+knitr::include_graphics("figs/trend_fig_all.pdf")
+```
+
 
 ```{r}
 readxl::read_excel("tables.xlsx", sheet = "trend_summary") %>% 

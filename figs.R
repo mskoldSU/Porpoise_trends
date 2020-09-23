@@ -152,6 +152,27 @@ y_labs <- c("Mean daily DPH", "Mean daily DPS", "Mean daily clicks", "Mean daily
 trend_figs <- map2(index_data, y_labs, ~trend_fig(.x, .y))
 
 ##
+## All trends fig
+##
+
+all_trends_fig <- index_data %>% map_df(bind_rows) %>% 
+  group_by(station, response_type) %>% 
+  nest(data = c(year, index)) %>% 
+  mutate(fit = map(data, ~lm(log(index) ~ year, data = .x)),
+         trend = map_dbl(fit, ~100*(exp(coef(.x)["year"])-1)),
+         upper = map_dbl(fit, ~100*(exp(confint(.x)["year", "97.5 %"])-1)),
+         lower = map_dbl(fit, ~100*(exp(confint(.x)["year", "2.5 %"])-1))
+  ) %>% 
+  ggplot(aes(x = response_type)) + 
+  geom_point(aes(y = trend), size = 2, color = "steelblue") +
+  geom_linerange(aes(ymin = lower, ymax = upper), size = 1, color = "steelblue") + 
+  facet_wrap(~station) + theme_bw() + ylim(c(-50, 50)) +
+  geom_abline(intercept = 0, slope = 0) +
+  ylab("Yearly change (%)") + xlab("") +
+  theme(panel.grid = element_blank()) +
+  scale_x_discrete(labels = c("DPH", "DPS", "Clicks", "Encounters", "Trains")) + coord_flip()
+
+##
 ## Data fig
 ##
 
@@ -174,5 +195,6 @@ ggsave(map_basic, filename = "figs/map_basic.pdf", width = 7, height = 6)
 ggsave(map_dph, filename = "figs/map_dph.pdf", width = 7, height = 10)
 ggsave(season_fig, filename = "figs/season_fig.pdf", width = 7, height = 3)
 walk2(trend_figs, indices, ~ggsave(.x, filename = paste0("figs/trend_fig_", .y, ".pdf"), width = 7, height = 6))
+ggsave(all_trends_fig, filename = "figs/trend_fig_all.pdf", width = 7, height = 6)
 ggsave(data_fig, filename = "figs/data_fig.pdf", width = 7, height = 6)
 
