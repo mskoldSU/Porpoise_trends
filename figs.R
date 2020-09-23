@@ -30,8 +30,16 @@ library(rnaturalearthdata)
 library(sf)
 library(ggspatial)
 
-map_polygons <- ne_countries(scale = "large", returnclass = "sf") %>% 
-  st_crop(c(xmin=7, xmax=26, ymin=53, ymax=61))
+map_polygons <- st_read("shp/Administrative_borders_1.shp") %>%
+  st_transform("+proj=longlat +datum=WGS84") %>% slice(70:73) %>% 
+  st_union()
+
+NMB <- st_read("shp/sandbank.shp") %>% 
+  filter(fid == 1094) %>% st_transform("+proj=longlat +datum=WGS84") %>% 
+  smoothr::smooth(method = "ksmooth")
+
+Natura <- st_read("shp/Natura2000_end2016_SE_Pp.shp") %>% 
+  st_transform("+proj=longlat +datum=WGS84")
 
 inset_map <- ggplot(ne_countries(scale = "medium", returnclass = "sf")) +
   geom_sf() +
@@ -44,18 +52,23 @@ inset_map <- ggplot(ne_countries(scale = "medium", returnclass = "sf")) +
         axis.ticks.length = unit(0, "mm"))
 
 # Basic map
-map_plot <- ggplot(map_polygons) + geom_sf() +    
-  coord_sf(xlim = c(15, 17.75), ylim = c(55.5, 56.5), expand = FALSE) +
-  geom_point(data = station_cords, aes(x = long, y = lat), color = "black") +
+map_plot <- ggplot(map_polygons) + geom_sf(fill = "lightgrey") +  
+  geom_sf(data = NMB, color = NA) + geom_sf(data = Natura, fill = NA, linetype = 2, alpha = .5) +
+  coord_sf(xlim = c(15, 17.9), ylim = c(55.3, 56.5), expand = FALSE) +
+  geom_point(data = station_cords, 
+             aes(x = long, y = lat, shape = (station %in% c("1032", "1036", "1041"))), color = "black", show.legend = FALSE) +
   theme_bw() + theme(panel.grid = element_blank()) +
   xlab("") + ylab("") +
   geom_text(data = station_cords, aes(x = long, y = lat+.05, label = station)) +
   annotation_north_arrow(location = "tl", height = unit(0.7, "cm"), width = unit(0.7, "cm")) +
-  annotation_scale()
+  annotation_scale() + annotate("text", x = 17.3, y = 56.2, label = "Northern Midsea Bank", fontface = 3) +
+  scale_shape_manual(values = c(1, 16))
 
 map_basic <- cowplot::ggdraw() +
   cowplot::draw_plot(map_plot) +
-  cowplot::draw_plot(inset, x = 0.73, y = 0.17, width = 0.25, height = 0.25)
+  cowplot::draw_plot(inset_map, x = 0.107, y = 0.17, width = 0.25, height = 0.25)
+
+ggsave(map_basic, filename = "map.pdf", width = 7, height = 6)
 
 # DPH by study
 map_data <- daily_data %>% 

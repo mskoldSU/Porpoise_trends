@@ -30,10 +30,17 @@ data_table <- summary_table(daily_data) %>%
 ## Trends tables
 ##
 
-indices <- c("dph", "dps", "n_clicks", "n_encounters", "n_trains")
-index_data <- map(indices, ~make_indices(index_stations, index_years, index_season, response = .x))
+responses <- c("dph", "dps", "n_clicks", "n_encounters", "n_trains")
+index_data <- map(responses, ~make_indices(index_stations, index_years, index_season, response = .x))
 coeff_tables <- map(index_data, coeff_table)
 
+##
+## Trends summary
+##
+
+trend_summary <- map2_df(responses, coeff_tables, ~mutate(.y, response = .x)) %>% 
+  select(station, trend, response) %>% 
+  pivot_wider(names_from = "response", values_from = "trend")
 
 ##
 ## Save tables
@@ -41,5 +48,7 @@ coeff_tables <- map(index_data, coeff_table)
 
 xlsx::write.xlsx(data_table, "tables.xlsx", sheetName = "data_table", append = FALSE)
 walk2(paste0("trend_table_", indices), coeff_tables, ~xlsx::write.xlsx(.y, "tables.xlsx", sheetName = .x, append = TRUE))
+xlsx::write.xlsx(trend_summary, "tables.xlsx", sheetName = "trend_summary", append = TRUE)
+
 
 

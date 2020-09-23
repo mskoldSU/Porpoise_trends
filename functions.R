@@ -71,10 +71,13 @@ summary_table <- function(data){
 make_indices <- function(index_stations, index_years, index_season, response){
   all_stations <- paste0(index_stations, collapse = "+")
   read_csv("imputed_data.csv", col_types = cols(station = col_character())) %>% 
-    filter(station %in% index_stations, year %in% index_years, lubridate::month(date) %in% index_season, response_type == response) %>% 
-    group_by(station, year) %>% 
+    filter(station %in% index_stations, 
+           year %in% index_years, 
+           lubridate::month(date) %in% index_season, 
+           response_type == response) %>% 
+    group_by(station, year, response_type) %>% 
     summarise(index = mean(imputed)) %>% 
-    bind_rows(. , group_by(., year) %>% summarise(index = sum(index)) %>% mutate(station = all_stations)) %>% 
+    bind_rows(. , group_by(., year, response_type) %>% summarise(index = sum(index)) %>% mutate(station = all_stations)) %>% 
     mutate(station = factor(station, c(index_stations, all_stations))) %>% 
     ungroup()
 }

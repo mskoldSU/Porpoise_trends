@@ -14,11 +14,6 @@ library(kableExtra)
 knitr::include_graphics("figs/map_basic.pdf")
 ```
 
-
-```{r, fig.cap= "Map by study with mean DPH"}
-knitr::include_graphics("figs/map_dph.pdf")
-```
-
 ```{r, fig.cap= "Seasonal components rescaled to unit integral (solid: common, dashed: SAMBAH, dotted: SNMP)"}
 knitr::include_graphics("figs/season_fig.pdf")
 ```
@@ -46,6 +41,7 @@ readxl::read_excel("tables.xlsx", sheet = "data_table") %>%
 ```
 
 
+
 ```{r, asis = TRUE}
 readxl::read_excel("tables.xlsx", sheet = "trend_table_dph") %>% 
   select(-"...1")  %>% 
@@ -58,6 +54,23 @@ readxl::read_excel("tables.xlsx", sheet = "trend_table_dph") %>%
 
 
 # SI
+
+
+```{r, fig.cap= "Choosing cut-off for clustering"}
+knitr::include_graphics("figs/cluster_fig.pdf")
+```
+
+
+```{r}
+readxl::read_excel("tables.xlsx", sheet = "trend_summary") %>% 
+  select(-"...1")  %>% 
+  kbl(booktabs = TRUE, 
+      align = "lrrrrr",
+      col.names = c("Station", "DPH", "DPS", "Clicks", "Encounters", "Click trains"),
+      caption = "Trends for various metrics") %>% 
+  add_header_above(c(" " = 1, "Yearly change (%) with 95% confidence intervals" = 5))
+```
+
 
 ```{r, asis = TRUE}
 readxl::read_excel("tables.xlsx", sheet = "trend_table_dps") %>% 

@@ -96,3 +96,50 @@ daily_data <- data_full %>%
   mutate(remove = (minutes_on < 1439) | (minutes_lying > 100) | (max_temp - min_temp > 10)) # Flag suspicious days 
 
 write_csv(daily_data, "daily_data.csv")
+
+
+#
+# Clustering fig for S1
+#
+
+cluster_data <- data_full %>% 
+  filter(dpm == 1, station %in% c("1041", "1032", "1036")) %>% 
+  mutate(minutes_since_start = as.numeric(chunk_end)/60,
+         year = lubridate::year(chunk_end)) %>% 
+  select(station, minutes_since_start, year)
+
+
+tree_1036 <- filter(cluster_data, station == "1036") %>% 
+  pull(minutes_since_start) %>% 
+  dist() %>% 
+  hclust(method = "single")
+
+tree_1041 <- filter(cluster_data, station == "1041") %>% 
+  pull(minutes_since_start) %>% 
+  dist() %>% 
+  hclust(method = "single")
+
+tree_1032 <- filter(cluster_data, station == "1032") %>% 
+  pull(minutes_since_start) %>% 
+  dist() %>% 
+  hclust(method = "single")
+
+tree_random <- filter(cluster_data, station == "1036") %>% 
+  group_by(year) %>% 
+  summarise(l = min(minutes_since_start), u = max(minutes_since_start), n = n()) %>% 
+  mutate(sample = pmap(list(n = n, min = l, max = u), runif)) %>% 
+  pull(sample) %>% unlist() %>% as.numeric() %>% sort() %>% 
+  dist() %>% 
+  hclust(method = "single")
+
+heights <- tibble(height = 1:50)
+
+cluster_fig <- bind_rows(mutate(heights, n_clusters = map_dbl(height, ~cutree(tree_1036, h = .x) %>% max()), Station = "1036"),
+                         mutate(heights, n_clusters = map_dbl(height, ~cutree(tree_1041, h = .x) %>% max()), Station = "1041"),
+                         mutate(heights, n_clusters = map_dbl(height, ~cutree(tree_1032, h = .x) %>% max()), Station = "1032"),
+                         mutate(heights, n_clusters = map_dbl(height, ~cutree(tree_random, h = .x) %>% max()), Station = "Random")
+) %>% ggplot(aes(x = height, y = n_clusters, color = Station)) + geom_point() + theme_bw() + 
+  xlab("k") + 
+  ylab("Number of clusters") + scale_y_log10() + theme(legend.position = "top")
+
+ggsave(cluster_fig, filename = "figs/cluster_fig.pdf", width = 7, height = 6)
