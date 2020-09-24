@@ -156,6 +156,7 @@ trend_figs <- map2(index_data, y_labs, ~trend_fig(.x, .y))
 ##
 
 all_trends_fig <- index_data %>% map_df(bind_rows) %>% 
+  filter(response_type != "n_trains") %>% 
   group_by(station, response_type) %>% 
   nest(data = c(year, index)) %>% 
   mutate(fit = map(data, ~lm(log(index) ~ year, data = .x)),
@@ -170,7 +171,7 @@ all_trends_fig <- index_data %>% map_df(bind_rows) %>%
   geom_abline(intercept = 0, slope = 0) +
   ylab("Yearly change (%)") + xlab("") +
   theme(panel.grid = element_blank()) +
-  scale_x_discrete(labels = c("DPH", "DPS", "Clicks", "Encounters", "Trains")) + coord_flip()
+  scale_x_discrete(labels = c("DPH", "DPS", "Clicks", "Encounters")) + coord_flip()
 
 ##
 ## Data fig

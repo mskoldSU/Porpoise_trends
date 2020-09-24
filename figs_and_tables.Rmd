@@ -67,12 +67,12 @@ knitr::include_graphics("figs/trend_fig_all.pdf")
 
 ```{r}
 readxl::read_excel("tables.xlsx", sheet = "trend_summary") %>% 
-  select(-"...1")  %>% 
+  select(-"...1", -n_trains)  %>% 
   kbl(booktabs = TRUE, 
       align = "lrrrrr",
-      col.names = c("Station", "DPH", "DPS", "Clicks", "Encounters", "Click trains"),
+      col.names = c("Station", "DPH", "DPS", "Clicks", "Encounters"),
       caption = "Trends for various metrics") %>% 
-  add_header_above(c(" " = 1, "Yearly change (%) with 95% confidence intervals" = 5))
+  add_header_above(c(" " = 1, "Yearly change (%) with 95% confidence intervals" = 4))
 ```
 
 
