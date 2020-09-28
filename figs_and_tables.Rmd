@@ -40,6 +40,19 @@ readxl::read_excel("tables.xlsx", sheet = "data_table") %>%
   kable_styling(latex_options = "scale_down")
 ```
 
+```{r, asis = TRUE}
+readxl::read_excel("tables.xlsx", sheet = "data_table") %>% 
+  select(-"...1") %>% 
+  kbl(caption = "Data summary (without extra spacing)", 
+      col.names = c("Station", rep(c("SAMBAH", "SNMP"), 3), "Change DPH (%)",
+                    rep(c("SAMBAH", "SNMP"), 3), "Change DPH (%)"),
+      digits = c(0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 3, 3, 0),
+      booktabs = TRUE,
+      linesep = "") %>% 
+  add_header_above(c(" " = 1, "Days reorded" = 2, "DPD" = 2, "Daily mean DPH" = 2, " " = 1, "Days reorded" = 2, "DPD" = 2, "Daily mean DPH" = 2, " " = 1)) %>% 
+  add_header_above(c(" " = 1, "Full data" = 7, "May - October" = 7)) %>% 
+  kable_styling(latex_options = "scale_down")
+```
 
 
 ```{r, asis = TRUE}
